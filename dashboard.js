@@ -385,8 +385,11 @@ function toggleDuration() {
     document.getElementById('act-type').value === 'lifetime' ? 'none' : 'flex';
 }
 async function api(url, data) {
-  const opts = data ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) } : {};
-  const r = await fetch(url, opts); return r.json();
+  try {
+    const opts = data ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) } : {};
+    const r = await fetch(url, opts);
+    return r.json();
+  } catch(e) { return { error: e.message }; }
 }
 function showResult(id, msg, isError) {
   const el = document.getElementById(id);
@@ -422,8 +425,9 @@ function sendWhatsApp() {
 async function loadDevices() {
   const list = document.getElementById('devices-list');
   list.innerHTML = '<div class="loading">⏳ جارِ التحميل...</div>';
-  const [r, bl] = await Promise.all([api('/api/devices'), api('/api/blocklist')]);
-  if (r.error) { list.innerHTML = '<div style="color:#fca5a5;padding:20px">❌ '+r.error+'</div>'; return; }
+  try {
+    const [r, bl] = await Promise.all([api('/api/devices'), api('/api/blocklist')]);
+    if (r.error) { list.innerHTML = '<div style="color:#fca5a5;padding:20px">❌ خطأ: '+r.error+'</div>'; return; }
   const blockedSet = new Set((bl.blocked||[]).map(h=>h.replace(/-/g,'').toUpperCase()));
   const devices = r.devices;
   const total=devices.length, lifetime=devices.filter(d=>d.licenseType==='lifetime').length;
@@ -463,6 +467,7 @@ async function loadDevices() {
         :'<button class="btn btn-danger" onclick="quickBlock(\''+hwid+'\')" style="padding:5px 12px;font-size:11px">🔒 حظر</button>')
       +'</div></div>';
   }).join('');
+  } catch(e) { list.innerHTML = '<div style="color:#fca5a5;padding:20px">❌ خطأ: '+e.message+'</div>'; }
 }
 
 function activateFrom(hwid, name) {
@@ -486,10 +491,13 @@ async function quickUnblock(hwid) {
 }
 
 async function loadBlocklist() {
-  const r = await api('/api/blocklist');
   const list = document.getElementById('blocked-list');
-  if(!r.blocked||!r.blocked.length){ list.innerHTML='<div style="color:#64748b;text-align:center;padding:16px">لا توجد أجهزة محظورة</div>'; return; }
-  list.innerHTML = r.blocked.map(hwid=>{
+  list.innerHTML = '<div class="loading">⏳ جارِ التحميل...</div>';
+  try {
+    const r = await api('/api/blocklist');
+    if(r.error){list.innerHTML='<div style="color:#fca5a5;padding:20px">❌ خطأ: '+r.error+'</div>';return;}
+    if(!r.blocked||!r.blocked.length){ list.innerHTML='<div style="color:#64748b;text-align:center;padding:16px">لا توجد أجهزة محظورة</div>'; return; }
+    list.innerHTML = r.blocked.map(hwid=>{
     const msg=r.messages[hwid]||'';
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04)">'
       +'<div><div style="font-family:monospace;font-size:12px;color:#fca5a5;direction:ltr">'+hwid+'</div>'
@@ -497,6 +505,7 @@ async function loadBlocklist() {
       +'<button class="btn btn-success" onclick="doUnblock(\''+hwid+'\')" style="padding:5px 12px;font-size:11px">🔓 فك الحظر</button>'
       +'</div>';
   }).join('');
+  } catch(e) { list.innerHTML='<div style="color:#fca5a5;padding:20px">❌ خطأ: '+e.message+'</div>'; }
 }
 
 async function doBlock() {
