@@ -224,11 +224,11 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Cairo',sans-serif; background:#0a0e1a; color:#e2e8f0; min-height:100vh; }
-.header { background:linear-gradient(135deg,#1e1b4b,#0f172a); border-bottom:1px solid rgba(99,102,241,.3); padding:16px 24px; display:flex; align-items:center; gap:14px; }
+.header { background:linear-gradient(135deg,#1e1b4b,#0f172a); border-bottom:1px solid rgba(99,102,241,.3); padding:16px 24px; display:flex; align-items:center; gap:14px; position:sticky; top:0; z-index:101; }
 .header .logo { width:42px; height:42px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; }
 .header h1 { font-size:18px; font-weight:900; }
 .header .sub { font-size:12px; color:#94a3b8; }
-.nav { display:flex; gap:4px; padding:12px 24px; background:#0f1629; border-bottom:1px solid rgba(255,255,255,.06); overflow-x:auto; }
+.nav { display:flex; gap:4px; padding:12px 24px; background:#0f1629; border-bottom:1px solid rgba(255,255,255,.06); overflow-x:auto; position:sticky; top:0; z-index:100; }
 .nav button { padding:10px 20px; border:none; border-radius:10px; background:transparent; color:#94a3b8; font-family:'Cairo',sans-serif; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; transition:.2s; }
 .nav button:hover { background:rgba(99,102,241,.1); color:#c7d2fe; }
 .nav button.active { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; }
@@ -377,6 +377,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
   if (name === 'devices') loadDevices();
   if (name === 'blocklist') loadBlocklist();
 }
