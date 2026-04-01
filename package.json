@@ -1,0 +1,15 @@
+{
+  "name": "kemet-dashboard",
+  "version": "1.0.0",
+  "description": "KEMET POS Admin Dashboard",
+  "main": "dashboard.js",
+  "scripts": {
+    "start": "node dashboard.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
